@@ -1,0 +1,32 @@
+body {
+  background-color: #000;
+  margin: 100px;
+}
+
+#circle {
+  border-radius: 50%;
+  width: 400px;
+  height: 400px;
+  border: 3px solid white;
+}
+
+.snare {
+  background: #d51;
+  position: absolute;
+  top: 50px;
+  right: 300px;
+}
+
+.kick {
+  background: #15d;
+  position: absolute;
+  bottom: 50px;
+  right: 800px;
+}
+
+.hats {
+  background: #5d1;
+  position: absolute;
+  top:50px;
+  left:300px;
+}
