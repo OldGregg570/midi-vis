@@ -1,36 +1,48 @@
 'use strict';
 
+var logger = console;
+
 (function () {
-  window.onload = main;
 
-  function main () {
-    window.navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+  const MSG_NOTE_ON = 144;
+  let app = angular.module('MidiVis', []);
 
-    function onMIDISuccess (midi) {
-      var inputs = midi.inputs.values();
-      for(var input = inputs.next(); input && !input.done; input = inputs.next()) {
-        input.value.onmidimessage = onMIDIMessage;
-      }
+  app.controller('mainCtrl', function ($scope, $filter, $window, midi, VisSquares, VisDrumShapes) {
+    $scope.visualization = VisSquares;
+
+    main();
+
+    // Set up MIDI connection and midi message handler
+    function main () {
+      let midiHandlers = {
+        noteOn: function (message) {
+            $scope.visualization.noteOn(message);
+        },
+        programChange: function (message) {
+            logger.debug(message);
+        }
+      };
+
+      $scope.visualization.setup();
+
+
+      midi.init(midiHandlers).then(() => {
+          logger.debug("Midi connected");
+      });
     }
 
-    function onMIDIFailure () { }
+    /**
+     * Return a list of patterns based on the selected visualization type
+     */
+    $scope.getVisualizationSelection = function(selectedType) {
+      return $filter('filter')($scope.options, selectedType)[0].patterns;
+    };
 
-    function onMIDIMessage(m) {
-      if (m.data[0] === 144) {
-        pulse(m.data[1]);
-      }
-    }
-  };
-
-  function pulse(note) {
-    let drum = { 0: { class: 'kick', color: '#15d' },
-                 2: { class: 'snare', color: '#d51' },
-                 6: { class: 'hats', color: '#5d1' } }[ note - 36 ];
-
-    if (drum) {
-      $('.' + drum.class).animate({
-       'background-color': 'white'
-      }, 40, function() { $(this).animate({ 'background-color': drum.color }, 60); });
-    }
-  }
+    /**
+     * Initialize and switch to the selected visualization
+     */
+    $scope.setVisualizationSelection = function(selectedType) {
+        logger.debug(vis);
+    };
+  });
 })();
